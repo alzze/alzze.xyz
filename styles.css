@@ -1,0 +1,48 @@
+  * {
+    font-family: monospace;
+  }
+
+  header {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  body{
+    display: flex;
+    flex-direction: column;
+    width: 95%;
+    max-width:750px;
+    margin:auto;
+  }
+
+  article{
+    max-width: 100%;
+    margin:auto;
+  }
+
+  b{
+    margin-block: .2rem;
+  }
+
+  pre {
+    font-size: .9rem;
+    max-width: 100%;
+    color: black;
+    overflow-x: auto;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+  pre {
+    background-color: #FFFFF0;
+    border: solid 0.1em #bdb76b;
+    padding: 1em;
+    width: 90%;
+    margin: auto;
+    overflow-x: auto;
+  }
+  code {
+    white-space: pre-wrap;
+  }
+  pre code {
+    white-space: pre;
+  }
