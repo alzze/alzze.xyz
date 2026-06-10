@@ -1,0 +1,88 @@
+<html>
+<head>
+  <title> transistor theory and FPGAs </title>
+  <link rel="stylesheet" href="/styles.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+</head>
+<body>
+  <header>
+    <a href='/'>[about]</a>
+  </header>
+
+  <article>
+  <p>TRANSISTOR THEORY AND FPGAS</p>
+  <hr>
+
+  <p>Transistors are one of the main components in electronics, and they can function as amplifiers, switches, or signal modulators. A transistor is a device with three terminals, one of which acts as a control terminal, regulating the behavior of the other two terminals. There are two main types of transistors: BJT and FET.</p>
+
+  <p>The <b>BJT</b> (Bipolar Junction Transistors) are devices formed by two PN junctions, one of them in forward bias and the other in reverse bias. This configuration allows the flow of electrons and holes between the collector and the emitter, while the base regulates this flow. BJT transistors can have two types of PN junctions: the NPN type, where an N-type region is placed between two P-type regions, and the PNP type, where a P-type region is placed between two N-type regions. Each of these regions corresponds to a terminal: base, collector, or emitter.</p>
+
+  <img src="img/BJT.webp" style="max-width:100%">
+
+  <p><b>FET</b> (Field-Effect Transistors) are semiconductor devices that control the flow of current using an electric field. Among them, MOSFETs are the most common, consisting of a gate, drain, and source. Unlike BJTs, MOSFETs are controlled by voltage rather than current, making them more energy-efficient. Their high switching speed and low power dissipation make them essential components in digital electronics, particularly in integrated circuits such as processors and memory devices.</p>
+
+  <p>Integrated circuits (ICs) are basically circuits made up of electronic components such as transistors, resistors, capacitors, and others, which are physically connected and assembled on a chip to perform a specific function. They can be as simple as a logic gate, like the 7400 series, or as complex as microprocessors or microcontrollers.</p>
+
+  <img src="img/inverter.webp" style="max-width:100%">
+
+  <p><b>FPGA</b></p>
+
+  <p><b>FPGAs</b> (Field Programmable Gate Arrays), unlike other devices such as microcontrollers or microprocessors designed to interpret and execute a set of instructions, allow the hardware to be configured through configurable physical connections. This means that, instead of having a fixed circuit, the FPGA allows reconfiguring its internal components, such as transistors and logic gates, to form specific circuits that perform particular tasks.</p>
+
+  <p>FPGAs consist of an array of interconnected logic blocks that group logical cells. The logical cells are electronic components, mainly LUTs, multiplexers, and flip-flops.</p>
+
+  <p>A <b>LUT</b> (Look-Up Table) is a table configured within an FPGA used to implement logical functions efficiently. It stores the result of all possible input combinations, allowing the corresponding output to be generated quickly for each set of inputs.</p>
+
+  <p>A <b>multiplexer</b> is a digital component that selects one of several inputs and directs it to a single output, based on control signals. It works like a switch, where the control signals determine which input is passed to the output at any given time.</p>
+
+  <p>A <b>flip-flop</b> is a storage circuit for a single bit of information, which can maintain its state (0 or 1) until a control signal, such as a clock pulse, is received. Its operation is based on changing its output state in response to this signal, enabling synchronization and data storage in digital systems, such as registers or counters.</p>
+
+  <img src="img/block.webp" style="max-width:100%">
+
+  <p>The logic blocks of FPGAs are connected by a matrix of programmable routes, allowing the connections between them to be changed as needed. This reconfiguration capability makes the hardware flexible, as custom circuits can be created and modified to perform specific functions, adapting to different tasks.</p>
+
+  <p>FPGAs include other elements apart from the logic blocks, such as memories, input and output blocks that facilitate interaction with the outside, and even microcontrollers integrated into some models, making them quite complete for various types of projects.</p>
+
+  <p><b>FPGA configuration</b></p>
+
+  <p>The FPGA design process begins with the creation of the HDL code, which defines the logic and behavior of the circuit. This code is synthesized to generate a netlist, which is a diagram of the necessary connections and logic elements. Next, the map, place, and route process takes place, where the connections and logic blocks are assigned to specific areas of the FPGA. Finally, a bitstream file is generated, which is loaded onto the FPGA, configuring the physical connections and allowing the device to execute the designed program.</p>
+
+  <p><a href="https://www.youtube.com/watch?v=H5MV7U8UHhk">Recommended video</a></p>
+
+  <p>Download <a href="https://verilator.org/guide/latest/">verilator</a></p>
+
+  </article>
+</body>
+<style>
+  * {
+    font-family: monospace;
+  }
+
+  header {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  body{
+    display: flex;
+    flex-direction: column;
+    width: 95%;
+    max-width:750px;
+    margin:auto;
+  }
+
+  article{
+    max-width: 100%;
+    margin:auto;
+  }
+
+  pre {
+    max-width: 100%;
+    overflow-x: auto;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+</style>
+</html>
