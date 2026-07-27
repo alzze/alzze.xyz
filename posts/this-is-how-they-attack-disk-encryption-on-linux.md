@@ -1,6 +1,6 @@
 ---
     title: This is how they attack disk encryption on Linux 
-    date(YYYY-MM-DD): 2026-03-27
+    date: 2026-03-27
 ---
 
 Nowadays we carry practically our entire lives with us: phones, laptops, accounts, and communications. A large part of our information is stored on these devices and, although most include full disk encryption, the police can unlock many of them.

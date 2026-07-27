@@ -1,6 +1,6 @@
 ---
     title: Así atacan el cifrado de disco en Linux
-    date(YYYY-MM-DD): 2026-03-27
+    date: 2026-03-27
 ---
 
 Hoy en día llevamos prácticamente toda nuestra vida con nosotros:  móviles, portátiles, cuentas y comunicaciones. Gran parte de nuestra  información está almacenada en estos dispositivos y, aunque la mayoría  incluyen full disk encryption, la policía sigue pudiendo desbloquear la mayoría de estos.
