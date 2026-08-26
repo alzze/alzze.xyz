@@ -39,7 +39,7 @@ El funcionamiento se basa en una red de gateways independientes de ar.io. Cuando
 
 En los últimos días la web ha sufrido intentos de bloqueo. Algunos gateways han empezado a devolver códigos de error 451 (bloqueado por política de contenido) o a dejar de responder, y Take-Two ha intensificado las acciones legales y los DMCAs. Sin embargo, gracias a la arquitectura distribuida, el contenido base sigue accesible a través de otros gateways y mirrors. El material almacenado en Arweave no puede eliminarse fácilmente, por lo que, aunque se cierren puntos de acceso concretos, la información permanece disponible en la red.
 
-Las funcionalidades que ofrece la web son varias. Incluye el manifiesto completo (conocido como “The CYBERLEEK Edict”), donde se detallan las tres demandas sobre preventas digitales, DLC y preservación de juegos. Dispone de una sección de “Leeks” con todos los vídeos e imágenes filtrados, enlazados tanto a Arweave como a mirrors externos. Muestra en tiempo real la información del token $CYBERLEEK (precio, market cap, liquidez y estado de seguridad). Incorpora un sistema de votaciones on-chain: cada opción de la encuesta tiene una wallet de Solana asociada y los usuarios votan enviando tokens $CYBERLEEK a esa dirección; la web lee los balances y calcula los porcentajes automáticamente.
+Las funcionalidades que ofrece la web son varias. Incluye el manifiesto completo (conocido como “The CYBERLEEK Edict”), donde se detallan las tres demandas sobre preventas digitales, DLC y preservación de juegos. Dispone de una sección de “Leeks” con todos los vídeos e imágenes filtrados, enlazados tanto a Arweave como a mirrors externos. Muestra en tiempo real la información del token $CYBERLEEK (precio, market cap, liquidez y estado de seguridad). Incorpora un sistema de votaciones on-chain: cada opción de la encuesta tiene una wallet de Solana asociada y los usuarios votan enviando tokens $CYBERLEEK a esa dirección, la web lee los balances y calcula los porcentajes automáticamente.
 
 ![cyberleek-website](/img/posts/analyzing-the-infrastructure-used-by-cyberleek/cyberleek-website.webp)
 
@@ -75,12 +75,12 @@ Cyberleek aprovecha la simplicidad de las cuentas de Session y la privacidad de 
 
 Cuando alguien solicita contactar, el sistema genera dos cosas:
 
-- Una frase de recuperación de Session (es decir, una cuenta completamente nueva).
+- Una frase de recuperación de Session de una cuenta completamente nueva, (la cual permite restaurar la clave privada de la cuenta) 
 - Una cantidad exacta de Monero que empieza por 400 y añade una serie de decimales únicos (por ejemplo, 400.123456789012).
 
 Esos decimales funcionan como un identificador. El interesado debe enviar exactamente esa cantidad desde un monedero personal de Monero. Si lo hace desde un exchange, es muy probable que la cantidad se redondee o que se descuenten comisiones, con lo que se pierde el identificador y Cyberleek no puede vincular el pago a esa cuenta concreta.
 
-Cyberleek, al recibir la transacción en su monedero de Monero (donde solo él puede ver con claridad los detalles gracias a las propiedades de Monero), utiliza esos decimales para identificar y derivar la cuenta de Session correspondiente. Una vez hecho esto, inicia la conversación a través de Session en un plazo máximo de 24 horas.
+Cyberleek, al recibir la transacción en su monedero de Monero (donde solo él puede ver con claridad los detalles gracias a las propiedades de privacidad de Monero), utiliza esos decimales para identificar y derivar la cuenta de Session correspondiente. Una vez hecho esto, inicia la conversación a través de Session en un plazo máximo de 24 horas.
 
 De esta forma consigue tres objetivos a la vez: filtra a quien no está dispuesto a pagar una cantidad elevada, obtiene un ingreso significativo y mantiene un canal de comunicación con un nivel de privacidad considerablemente más alto que el que tendría usando cualquier mensajería convencional o dejando expuesto un identificador de forma pública.
 

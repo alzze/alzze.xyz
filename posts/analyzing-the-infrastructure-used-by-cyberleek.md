@@ -9,7 +9,7 @@ At this point we still know very little about the real identity behind the Cyber
 
 ![cyberleek-and-cops](/img/posts/analyzing-the-infrastructure-used-by-cyberleek/cyberleek-cops.webp)
 
-## The $CYBERLEEK token
+## $CYBERLEEK token
 
 In the various leaks Cyberleek has published, the attack was framed as consumer activism, tied to the controversy over GTA VI not being released on physical media. By now it is clear that this was only an attempt to win public sympathy, and that the real goal is to make money.
 
@@ -39,7 +39,7 @@ Resolution runs through an independent network of ar.io gateways. When a user op
 
 In the last few days the site has come under blocking attempts. Some gateways have started returning 451 status codes (blocked by content policy) or have stopped responding, and Take-Two has stepped up legal action and DMCA notices. Because of the distributed design, though, the underlying content remains reachable through other gateways and mirrors. Material stored on Arweave cannot be deleted easily, so even if specific access points are shut down, the information stays on the network.
 
-The site itself has several functions. It hosts the full manifesto (known as “The CYBERLEEK Edict”), which sets out the three demands on digital pre-orders, DLC and game preservation. There is a “Leeks” section with every leaked video and image, linked both to Arweave and to external mirrors. It shows live data for the $CYBERLEEK token (price, market cap, liquidity and security status). It also includes an on-chain voting system: each poll option has an associated Solana wallet, users vote by sending $CYBERLEEK to that address, and the site reads the balances and computes the percentages automatically.
+The site itself has several functions. It hosts the full manifesto (known as “The CYBERLEEK Edict”), which sets out the three demands on digital pre-orders, DLC and game preservation. There is a “Leeks” section with every leaked video and image, linked both to Arweave and to external mirrors. It shows live data for the $CYBERLEEK token (price, market cap, liquidity and security status). It also includes an on-chain voting system: each poll option has an associated Solana wallet, users vote by sending $CYBERLEEK tokens to that address, and the site reads the balances and computes the percentages automatically.
 
 ![cyberleek-website](/img/posts/analyzing-the-infrastructure-used-by-cyberleek/cyberleek-website.webp)
 
@@ -75,12 +75,12 @@ Cyberleek uses the simplicity of Session accounts and the privacy of Monero to b
 
 When someone asks to make contact, the system generates two things:
 
-- A Session recovery phrase (that is, a brand-new account).
+- A Session recovery phrase for a brand-new account (which can restore the account's private key)
 - An exact Monero amount that starts with 400 and adds a unique string of decimals (for example, 400.123456789012).
 
 Those decimals work as an identifier. The interested party has to send exactly that amount from a personal Monero wallet. If the payment comes from an exchange, the amount will likely be rounded or have fees deducted, the identifier is lost, and Cyberleek cannot bind the payment to that specific account.
 
-When the transaction arrives in Cyberleek's Monero wallet (where only he can see the details clearly, thanks to Monero's properties), those decimals are used to identify and derive the matching Session account. After that, the conversation is started over Session within 24 hours.
+When the transaction arrives in Cyberleek's Monero wallet (where only he can see the details clearly, thanks to Monero's privacy properties), those decimals are used to identify and derive the matching Session account. After that, the conversation is started over Session within 24 hours.
 
 That achieves three things at once: it filters out anyone unwilling to pay a large amount, it produces a significant extra payment, and it keeps a communications channel with considerably stronger privacy than conventional messaging — or than publishing an identifier in the open.
 
