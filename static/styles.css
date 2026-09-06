@@ -492,11 +492,6 @@ footer {
     padding: 0.6rem 0;
   }
 
-  .nav-left a:not(:first-child),
-  .nav-left .separator {
-    display: none;
-  }
-
   .nav-right {
     margin-left: 0;
   }

@@ -90,3 +90,6 @@ if __name__ == '__main__':
 
     render_file('templates/index.html', 'index.html', {'posts': en_posts, 'lang': 'en'})
     render_file('templates/index.html', 'es/index.html', {'posts': es_posts, 'lang': 'es'})
+
+    render_file('templates/about.html', 'about.html', {'lang': 'en'})
+    render_file('templates/about.html', 'es/about.html', {'lang': 'es'})

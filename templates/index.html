@@ -14,7 +14,12 @@
 <body>
   <header class="site-header">
     <nav class="nav-left">
-      <a href="/">alzze</a>
+      <a href="/">alzze</a> /
+      {% if lang == 'en' %}
+      <a href="/about.html">about</a>
+      {% else %}
+      <a href="/es/about.html">about</a>
+      {% endif %}
     </nav>
     <nav class="nav-right">
       <div class="lang-wrapper">
