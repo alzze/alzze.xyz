@@ -331,12 +331,11 @@ main {
   align-items: center;
   gap: 0.5rem;
   color: var(--muted);
-  font-size: 0.82rem;
 }
 
 .author img {
-  width: 20px;
-  height: 20px;
+  width: 30px;
+  height: 30px;
   object-fit: cover;
   border: 1px solid var(--line-strong);
   border-radius: 50%;
