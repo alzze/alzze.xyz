@@ -250,7 +250,6 @@ main {
 .index li {
   padding: 0 0 1.35rem;
   margin-bottom: 1.35rem;
-  border-bottom: 1px solid var(--line);
 }
 
 .index li:last-child {
