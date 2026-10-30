@@ -23,7 +23,7 @@ def get_posts(source='posts', url_prefix='/posts/'):
         slug, _ = os.path.splitext(post.name)
         url = url_prefix + slug + '/'
         image = '/img/posts/' + slug + '/main.webp'
-        with open(post, "r") as f:
+        with open(post, "r", encoding="utf-8") as f:  # ← cambio principal
             lines = f.readlines()
         if lines[0].strip() == "---":
             frontmatter_end = None
